@@ -140,3 +140,14 @@ def test_submit_feedback_validation_error(client, mock_responses):
             description=""
         )
     assert exc.value.status_code == 400
+
+def test_check_health(client, mock_responses):
+    mock_responses.add(
+        mock_responses.GET,
+        f"{API_URL}/v1/health",
+        json={'status': 'success', 'data': {'status': 'healthy', 'version': '1.0.0', 'timestamp': '2025-02-18T15:59:27Z'}},
+        status=200,
+    )
+    
+    response = client.utils.check_health()
+    assert response.status == "success"

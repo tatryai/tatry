@@ -8,7 +8,7 @@ def mock_responses():
     with RequestsMock() as rsps:
         yield rsps
 
-def test_search_basic(client, mock_responses):
+def test_retrieve_basic(client, mock_responses):
     mock_responses.add(
         mock_responses.POST,
         f"{API_URL}/v1/retrieve",
@@ -30,13 +30,13 @@ def test_search_basic(client, mock_responses):
         status=200,
     )
     
-    response = client.retrieve.search("test query")
+    response = client.retrieve.retrieve("test query")
     assert isinstance(response, DocumentResponse)
     assert len(response.documents) == 1
     assert response.documents[0].id == "doc_1"
     assert response.documents[0].relevance_score == 0.95
 
-def test_batch_search(client, mock_responses):
+def test_batch_retrieve(client, mock_responses):
     mock_responses.add(
         mock_responses.POST,
         f"{API_URL}/v1/retrieve/batch",
@@ -81,7 +81,7 @@ def test_batch_search(client, mock_responses):
         {"query": "first query", "max_results": 1},
         {"query": "second query", "max_results": 1}
     ]
-    results = client.retrieve.batch_search(queries)
+    results = client.retrieve.batch_retrieve(queries)
     assert isinstance(results, list)
     assert len(results) == 2
     assert all(isinstance(result, BatchQueryResult) for result in results)

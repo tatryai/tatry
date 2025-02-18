@@ -9,7 +9,7 @@ from .api.sources import SourcesAPI
 from .api.utils import UtilsAPI
 from .api.auth import AuthAPI
 
-API_URL = "https://api.tatry.ai"
+API_URL = "https://api.tatry.dev"
 
 class TatryRetriever:
     """

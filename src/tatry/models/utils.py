@@ -38,3 +38,7 @@ class FeedbackData(BaseModel):
 class FeedbackResponse(BaseModel):
     status: str
     data: FeedbackData
+
+class HealthResponse(BaseModel):
+    status: str
+    data: Dict[str, str]

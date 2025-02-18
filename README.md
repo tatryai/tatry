@@ -63,10 +63,10 @@ for key in keys:
 
 ```python
 # Basic search
-results = retriever.retrieve.search("artificial intelligence")
+results = retriever.retrieve.retrieve("artificial intelligence")
 
 # Search with parameters
-results = retriever.retrieve.search(
+results = retriever.retrieve.retrieve(
     query="machine learning frameworks",
     max_results=10
 )
@@ -80,7 +80,7 @@ queries = [
     {"query": "neural networks", "max_results": 5},
     {"query": "deep learning", "max_results": 3}
 ]
-results = retriever.retrieve.batch_search(queries)
+results = retriever.retrieve.batch_retrieve(queries)
 ```
 
 ## Source Management

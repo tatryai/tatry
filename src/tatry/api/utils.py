@@ -1,5 +1,5 @@
 from typing import Optional
-from ..models.utils import UsageResponse, FeedbackRequest, FeedbackResponse
+from ..models.utils import UsageResponse, FeedbackRequest, FeedbackResponse, HealthResponse
 
 class UtilsAPI:
     def __init__(self, client):
@@ -47,3 +47,17 @@ class UtilsAPI:
             json=feedback.model_dump(),
         )
         return FeedbackResponse(**response)
+    
+    def check_health(
+        self,
+    ) -> HealthResponse:
+        """
+        Check the health of the API.
+        
+        Returns:
+            dict: Health check response
+        """
+
+        response = self.client._request("GET", "/v1/health")
+        return HealthResponse(**response)
+    

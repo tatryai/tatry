@@ -5,7 +5,7 @@ class RetrieveAPI:
     def __init__(self, client):
         self.client = client
 
-    def search(self, query: str, max_results: int = 10) -> DocumentResponse:
+    def retrieve(self, query: str, max_results: int = 10) -> DocumentResponse:
         """
         Search for documents using a query.
         
@@ -23,7 +23,7 @@ class RetrieveAPI:
         )
         return DocumentResponse(**response)
 
-    def batch_search(
+    def batch_retrieve(
         self,
         queries: List[dict],
     ) -> List[BatchQueryResult]:
