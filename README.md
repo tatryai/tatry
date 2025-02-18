@@ -2,8 +2,6 @@
 
 Official Python SDK for the Tatry Content Retrieval API.
 
-[![PyPI version](https://badge.fury.io/py/tatry.svg)](https://badge.fury.io/py/tatry)
-[![Python Support](https://img.shields.io/pypi/pyversions/tatry.svg)](https://pypi.org/project/tatry)
 
 ## Installation
 
@@ -145,7 +143,6 @@ except TatryError as e:
 ```python
 retriever = TatryRetriever(
     api_key="your_api_key",
-    base_url="http://api.example.com",  # Custom API URL
     timeout=30,                         # Request timeout in seconds
     max_retries=3                      # Maximum retry attempts
 )
@@ -172,7 +169,3 @@ pytest
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
