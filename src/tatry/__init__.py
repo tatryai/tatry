@@ -1,19 +1,22 @@
-__version__ = "0.1.0"
+__version__ = "1.0.5"
 
-from .client import TatryRetriever
+from .retrievers.tatry import TatryRetriever
 from .exceptions import (
-    TatryAPIError,
-    TatryAuthError,
-    TatryConfigError,
-    TatryError,
-    TatryTimeoutError,
+    RetrieverError,
+    RetrieverAPIError,
+    RetrieverAuthError,
+    RetrieverConfigError,
+    RetrieverTimeoutError,
+    RetrieverConnectionError,
 )
 
 __all__ = [
+    "BaseRetriever",
     "TatryRetriever",
-    "TatryError",
-    "TatryAPIError",
-    "TatryAuthError",
-    "TatryConfigError",
-    "TatryTimeoutError",
+    "RetrieverError",
+    "RetrieverAPIError",
+    "RetrieverAuthError",
+    "RetrieverConfigError",
+    "RetrieverTimeoutError",
+    "RetrieverConnectionError",
 ]

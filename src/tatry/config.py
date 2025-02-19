@@ -3,9 +3,9 @@ from dataclasses import dataclass
 
 @dataclass
 class Config:
-    """Configuration for the Tatry client."""
+    """Configuration for the Retriever client."""
 
     api_key: str
-    base_url: str = "http://localhost:8080"
+    base_url: str
     timeout: int = 30
     max_retries: int = 3
