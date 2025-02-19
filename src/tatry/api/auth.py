@@ -1,17 +1,20 @@
-from typing import List, Optional
-from ..models.auth import ValidateResponse, APIKey
+from typing import Dict, List, Optional, Union
+
+from ..client import TatryRetriever
+from ..models.auth import APIKey, ValidateResponse
+
 
 class AuthAPI:
-    def __init__(self, client):
+    def __init__(self, client: TatryRetriever):
         self.client = client
 
     def validate_key(self) -> ValidateResponse:
         """
         Validate the current API key.
-        
+
         Returns:
             ValidateResponse: Validation result including permissions and rate limits
-            
+
         Raises:
             TatryAuthError: If the API key is invalid
         """
@@ -22,20 +25,20 @@ class AuthAPI:
         self,
         status: Optional[str] = None,
         limit: Optional[int] = None,
-        offset: Optional[int] = None
+        offset: Optional[int] = None,
     ) -> List[APIKey]:
         """
         List all API keys for the organization.
-        
+
         Args:
             status (str, optional): Filter keys by status (active/inactive)
             limit (int, optional): Maximum number of keys to return
             offset (int, optional): Number of keys to skip
-            
+
         Returns:
             List[APIKey]: List of API keys
         """
-        params = {}
+        params: Dict[str, Union[str, int]] = {}
         if status:
             params["status"] = status
         if limit:

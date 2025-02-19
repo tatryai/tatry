@@ -1,17 +1,25 @@
 from typing import Optional
-from ..models.utils import UsageResponse, FeedbackRequest, FeedbackResponse, HealthResponse
+
+from ..client import TatryRetriever
+from ..models.utils import (
+    FeedbackRequest,
+    FeedbackResponse,
+    HealthResponse,
+    UsageResponse,
+)
+
 
 class UtilsAPI:
-    def __init__(self, client):
+    def __init__(self, client: TatryRetriever):
         self.client = client
 
     def get_usage(self, month: Optional[str] = None) -> UsageResponse:
         """
         Get usage statistics.
-        
+
         Args:
             month (str, optional): Month in YYYY-MM format
-            
+
         Returns:
             UsageResponse: Usage statistics
         """
@@ -27,12 +35,12 @@ class UtilsAPI:
     ) -> FeedbackResponse:
         """
         Submit feedback about the API.
-        
+
         Args:
             feedback_type (str): Type of feedback (bug/feature/other)
             description (str): Detailed feedback description
             metadata (dict, optional): Additional context
-            
+
         Returns:
             FeedbackResponse: Feedback submission response
         """
@@ -47,17 +55,16 @@ class UtilsAPI:
             json=feedback.model_dump(),
         )
         return FeedbackResponse(**response)
-    
+
     def check_health(
         self,
     ) -> HealthResponse:
         """
         Check the health of the API.
-        
+
         Returns:
             dict: Health check response
         """
 
         response = self.client._request("GET", "/v1/health")
         return HealthResponse(**response)
-    

@@ -1,14 +1,17 @@
 from typing import List
-from ..models.sources import Source, ListSourcesResponse, GetSourceResponse
+
+from ..client import TatryRetriever
+from ..models.sources import GetSourceResponse, ListSourcesResponse, Source
+
 
 class SourcesAPI:
-    def __init__(self, client):
+    def __init__(self, client: TatryRetriever):
         self.client = client
 
     def list_sources(self) -> List[Source]:
         """
         List all available sources.
-        
+
         Returns:
             List[Source]: List of available sources
         """
@@ -19,13 +22,13 @@ class SourcesAPI:
     def get_source(self, source_id: str) -> Source:
         """
         Get detailed information about a specific source.
-        
+
         Args:
             source_id (str): ID of the source to get
-            
+
         Returns:
             Source: Detailed source information
-            
+
         Raises:
             TatryAPIError: If the source doesn't exist
         """

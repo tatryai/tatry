@@ -1,28 +1,37 @@
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from .config import Config
-from .exceptions import TatryAPIError, TatryAuthError, TatryConfigError, TatryTimeoutError
+from .api.auth import AuthAPI
 from .api.retrieve import RetrieveAPI
 from .api.sources import SourcesAPI
 from .api.utils import UtilsAPI
-from .api.auth import AuthAPI
+from .config import Config
+from .exceptions import (
+    TatryAPIError,
+    TatryAuthError,
+    TatryConfigError,
+    TatryTimeoutError,
+)
 
 API_URL = "https://api.tatry.dev"
+
 
 class TatryRetriever:
     """
     Main client for interacting with the Tatry API.
-    
+
     Args:
         api_key (str): Your API key for authentication
         timeout (int, optional): Request timeout in seconds. Defaults to 30
-        max_retries (int, optional): Maximum number of retries for failed requests. Defaults to 3
-        
+        max_retries (int, optional): Maximum number of retries for failed requests.
+        Defaults to 3
+
     Raises:
         TatryConfigError: If API key is empty or invalid
     """
+
     def __init__(
         self,
         api_key: str,
@@ -31,16 +40,16 @@ class TatryRetriever:
     ):
         if not api_key or not isinstance(api_key, str):
             raise TatryConfigError("API key is required")
-            
+
         self.config = Config(
             api_key=api_key,
             base_url=API_URL,
             timeout=timeout or 30,
             max_retries=max_retries or 3,
         )
-        
+
         self.session = self._create_session()
-        
+
         # Initialize API resources
         self.retrieve = RetrieveAPI(self)
         self.sources = SourcesAPI(self)
@@ -50,11 +59,13 @@ class TatryRetriever:
     def _create_session(self) -> requests.Session:
         """Create and configure requests session."""
         session = requests.Session()
-        session.headers.update({
-            "Authorization": f"Bearer {self.config.api_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        })
+        session.headers.update(
+            {
+                "Authorization": f"Bearer {self.config.api_key}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            }
+        )
         return session
 
     @retry(
@@ -70,22 +81,22 @@ class TatryRetriever:
     ) -> Dict[str, Any]:
         """
         Make an HTTP request to the API.
-        
+
         Args:
             method (str): HTTP method (GET, POST, etc.)
             path (str): API endpoint path
             **kwargs: Additional arguments to pass to requests
-            
+
         Returns:
             Dict[str, Any]: Parsed JSON response
-            
+
         Raises:
             TatryAPIError: If the API returns an error
             TatryAuthError: If authentication fails
             TatryTimeoutError: If the request times out
         """
         url = f"{self.config.base_url}{path}"
-        
+
         try:
             response = self.session.request(
                 method=method,
@@ -93,10 +104,10 @@ class TatryRetriever:
                 timeout=self.config.timeout,
                 **kwargs,
             )
-            
+
             response.raise_for_status()
-            return response.json()
-            
+            return response.json()  # type: ignore[no-any-return]
+
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 401:
                 raise TatryAuthError("Authentication failed", status_code=401)

@@ -1,12 +1,15 @@
 import pytest
 from responses import RequestsMock
+
 from tatry.client import API_URL
-from tatry.models.retrieve import DocumentResponse, BatchQueryResult
+from tatry.models.retrieve import BatchQueryResult, DocumentResponse
+
 
 @pytest.fixture
 def mock_responses():
     with RequestsMock() as rsps:
         yield rsps
+
 
 def test_retrieve_basic(client, mock_responses):
     mock_responses.add(
@@ -20,21 +23,22 @@ def test_retrieve_basic(client, mock_responses):
                     "metadata": {
                         "source": "wikipedia",
                         "published_date": "2024-02-18",
-                        "title": "Sample Document"
+                        "title": "Sample Document",
                     },
-                    "relevance_score": 0.95
+                    "relevance_score": 0.95,
                 }
             ],
-            "total": 1
+            "total": 1,
         },
         status=200,
     )
-    
+
     response = client.retrieve.retrieve("test query")
     assert isinstance(response, DocumentResponse)
     assert len(response.documents) == 1
     assert response.documents[0].id == "doc_1"
     assert response.documents[0].relevance_score == 0.95
+
 
 def test_batch_retrieve(client, mock_responses):
     mock_responses.add(
@@ -51,11 +55,11 @@ def test_batch_retrieve(client, mock_responses):
                             "metadata": {
                                 "source": "wikipedia",
                                 "published_date": "2024-02-18",
-                                "title": "First Document"
+                                "title": "First Document",
                             },
-                            "relevance_score": 0.9
+                            "relevance_score": 0.9,
                         }
-                    ]
+                    ],
                 },
                 {
                     "query_id": 1,
@@ -66,20 +70,20 @@ def test_batch_retrieve(client, mock_responses):
                             "metadata": {
                                 "source": "arxiv",
                                 "published_date": "2024-02-18",
-                                "title": "Second Document"
+                                "title": "Second Document",
                             },
-                            "relevance_score": 0.8
+                            "relevance_score": 0.8,
                         }
-                    ]
-                }
+                    ],
+                },
             ]
         },
         status=200,
     )
-    
+
     queries = [
         {"query": "first query", "max_results": 1},
-        {"query": "second query", "max_results": 1}
+        {"query": "second query", "max_results": 1},
     ]
     results = client.retrieve.batch_retrieve(queries)
     assert isinstance(results, list)

@@ -1,18 +1,22 @@
 from typing import List
-from ..models.retrieve import DocumentResponse, BatchResponse, BatchQueryResult
+
+from ..client import TatryRetriever
+from ..models.retrieve import BatchQueryResult, BatchResponse, DocumentResponse
+
 
 class RetrieveAPI:
-    def __init__(self, client):
+    def __init__(self, client: TatryRetriever):
         self.client = client
 
     def retrieve(self, query: str, max_results: int = 10) -> DocumentResponse:
         """
         Search for documents using a query.
-        
+
         Args:
             query (str): The search query
-            max_results (int, optional): Maximum number of results to return. Defaults to 10
-            
+            max_results (int, optional): Maximum number of results to return.
+            Defaults to 10
+
         Returns:
             DocumentResponse: Search results
         """
@@ -29,10 +33,10 @@ class RetrieveAPI:
     ) -> List[BatchQueryResult]:
         """
         Perform multiple searches in one request.
-        
+
         Args:
             queries (List[dict]): List of search queries with parameters
-            
+
         Returns:
             List[BatchQueryResult]: List of search results
         """
