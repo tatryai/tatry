@@ -47,15 +47,9 @@ jobs:
 
     - name: Publish to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      environment:
-        name: testpypi
-        url: https://test.pypi.org/p/tatry
       with:
         repository-url: https://test.pypi.org/legacy/
         skip-existing: true
 
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      environment:
-        name: pypi
-        url: https://pypi.org/p/tatry
