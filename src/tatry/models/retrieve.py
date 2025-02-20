@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class DocumentMetadata(BaseModel):
     source: str
     published_date: str
-    title: str
+    citation: str
 
 
 class Document(BaseModel):

@@ -1,22 +1,31 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional, Any
 
+from ..models.auth import ValidateResponse
 from ..models.retrieve import BatchQueryResult, DocumentResponse
-from ..models.auth import ValidateResponse, APIKey
 from ..models.sources import Source
-from ..models.utils import UsageResponse, FeedbackResponse, HealthResponse
+from ..models.utils import FeedbackResponse, HealthResponse
 
 
 class BaseRetriever(ABC):
     """Base class defining the retriever interface."""
 
     @abstractmethod
-    def _request(self, method: str, path: str, **kwargs) -> dict:
-        """Make an HTTP request to the API."""
+    def _request(self, method: str, path: str, **kwargs: Any) -> Dict[str, Any]:
+        """
+        Make an HTTP request to the API.
+
+        Args:
+            method: HTTP method (GET, POST, etc.)
+            path: API endpoint path
+            **kwargs: Additional arguments to pass to the request
+        """
         pass
 
     @abstractmethod
-    def retrieve(self, query: str, max_results: int = 10) -> DocumentResponse:
+    def retrieve(
+        self, query: str, max_results: int = 10, sources: List[str] = []
+    ) -> DocumentResponse:
         """Search for documents using a query."""
         pass
 
@@ -26,7 +35,7 @@ class BaseRetriever(ABC):
         pass
 
     @abstractmethod
-    def validate_key(self) -> ValidateResponse:
+    def validate_api_key(self) -> ValidateResponse:
         """Validate the API key."""
         pass
 
@@ -42,10 +51,7 @@ class BaseRetriever(ABC):
 
     @abstractmethod
     def submit_feedback(
-        self,
-        feedback_type: str,
-        description: str,
-        metadata: Optional[Dict] = None
+        self, feedback_type: str, description: str, metadata: Optional[Dict] = None
     ) -> FeedbackResponse:
         """Submit feedback."""
         pass

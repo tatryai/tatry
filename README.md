@@ -18,9 +18,9 @@ from tatry import TatryRetriever
 retriever = TatryRetriever(api_key="your_api_key")
 
 # Search for documents
-results = retriever.retrieve.search("quantum computing", max_results=5)
+results = retriever.retrieve("quantum computing", max_results=5, ["medical"])
 for doc in results.documents:
-    print(f"Title: {doc.metadata.title}")
+    print(f"Citation: {doc.metadata.citation}")
     print(f"Content: {doc.content[:200]}...")
     print(f"Relevance: {doc.relevance_score}")
     print("---")
@@ -45,7 +45,7 @@ from tatry import TatryRetriever
 retriever = TatryRetriever(api_key="your_api_key")
 
 # Validate your API key
-validation = retriever.auth.validate_key()
+validation = retriever.auth.validate_api_key()
 print(f"API Key Valid: {validation.data.valid}")
 print(f"Permissions: {validation.data.permissions}")
 print(f"Rate Limits: {validation.data.rate_limits.requests_per_minute}/min")

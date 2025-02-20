@@ -1,16 +1,17 @@
+from typing import Optional, Any, Dict
+
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
-from typing import Optional
 
-from ..base import BaseRetriever
 from ...config import Config
 from ...exceptions import (
     RetrieverAPIError,
     RetrieverAuthError,
     RetrieverConfigError,
-    RetrieverTimeoutError,
     RetrieverConnectionError,
+    RetrieverTimeoutError,
 )
+from ..base import BaseRetriever
 
 
 class TatryClient(BaseRetriever):
@@ -21,7 +22,7 @@ class TatryClient(BaseRetriever):
         api_key: str,
         timeout: Optional[int] = None,
         max_retries: Optional[int] = None,
-        base_url: str = "https://api.tatry.dev"
+        base_url: str = "https://api.tatry.dev",
     ):
         if not api_key or not isinstance(api_key, str):
             raise RetrieverConfigError("API key is required")
@@ -36,11 +37,13 @@ class TatryClient(BaseRetriever):
 
     def _create_session(self) -> requests.Session:
         session = requests.Session()
-        session.headers.update({
-            "Authorization": f"Bearer {self.config.api_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        })
+        session.headers.update(
+            {
+                "Authorization": f"Bearer {self.config.api_key}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            }
+        )
         return session
 
     @retry(
@@ -48,9 +51,20 @@ class TatryClient(BaseRetriever):
         wait=wait_exponential(multiplier=1, min=4, max=10),
         reraise=True,
     )
-    def _request(self, method: str, path: str, **kwargs) -> dict:
+    def _request(self, method: str, path: str, **kwargs: Any) -> Dict[str, Any]:
+        """
+        Make an HTTP request to the API.
+
+        Args:
+            method: HTTP method (GET, POST, etc.)
+            path: API endpoint path
+            **kwargs: Additional arguments passed to requests.request
+
+        Returns:
+            Dict[str, Any]: JSON response from the API
+        """
         url = f"{self.config.base_url}{path}"
-        
+
         try:
             response = self.session.request(
                 method=method,
@@ -59,19 +73,17 @@ class TatryClient(BaseRetriever):
                 **kwargs,
             )
             response.raise_for_status()
-            return response.json()
-            
+            return response.json()  # type: ignore[no-any-return]
+
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 401:
                 raise RetrieverAuthError(
-                    "Authentication failed",
-                    status_code=401,
-                    response=e.response
+                    "Authentication failed", status_code=401, response=e.response
                 )
             raise RetrieverAPIError(
                 f"API request failed: {str(e)}",
                 status_code=e.response.status_code,
-                response=e.response
+                response=e.response,
             )
         except requests.exceptions.Timeout as e:
             raise RetrieverTimeoutError(f"Request timed out: {str(e)}")

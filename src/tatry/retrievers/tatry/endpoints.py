@@ -1,21 +1,22 @@
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 
-from ..base import BaseRetriever
+from ...models.auth import ValidateResponse
 from ...models.retrieve import BatchQueryResult, DocumentResponse
-from ...models.auth import ValidateResponse, APIKey
 from ...models.sources import Source
-from ...models.utils import UsageResponse, FeedbackResponse, HealthResponse
+from ...models.utils import FeedbackResponse, HealthResponse
 from .client import TatryClient
 
 
 class TatryImplementation(TatryClient):
     """Implementation of Tatry API endpoints."""
 
-    def retrieve(self, query: str, max_results: int = 10) -> DocumentResponse:
+    def retrieve(
+        self, query: str, max_results: int = 10, sources: List[str] = []
+    ) -> DocumentResponse:
         response = self._request(
             "POST",
             "/v1/retrieve",
-            json={"query": query, "max_results": max_results},
+            json={"query": query, "max_results": max_results, "sources": sources},
         )
         return DocumentResponse.model_validate(response)
 
@@ -25,9 +26,11 @@ class TatryImplementation(TatryClient):
             "/v1/retrieve/batch",
             json={"queries": queries},
         )
-        return [BatchQueryResult.model_validate(result) for result in response["results"]]
+        return [
+            BatchQueryResult.model_validate(result) for result in response["results"]
+        ]
 
-    def validate_key(self) -> ValidateResponse:
+    def validate_api_key(self) -> ValidateResponse:
         response = self._request("POST", "/v1/auth/validate")
         return ValidateResponse.model_validate(response)
 
@@ -40,15 +43,12 @@ class TatryImplementation(TatryClient):
         return Source.model_validate(response["data"])
 
     def submit_feedback(
-        self,
-        feedback_type: str,
-        description: str,
-        metadata: Optional[Dict] = None
+        self, feedback_type: str, description: str, metadata: Optional[Dict] = None
     ) -> FeedbackResponse:
         data = {
             "type": feedback_type,
             "description": description,
-            "metadata": metadata or {}
+            "metadata": metadata or {},
         }
         response = self._request("POST", "/v1/feedback", json=data)
         return FeedbackResponse.model_validate(response)

@@ -3,15 +3,15 @@ try:
 except ImportError:
     __version__ = "1.0.2"
 
-from .retrievers.tatry import TatryRetriever
 from .exceptions import (
-    RetrieverError,
     RetrieverAPIError,
     RetrieverAuthError,
     RetrieverConfigError,
-    RetrieverTimeoutError,
     RetrieverConnectionError,
+    RetrieverError,
+    RetrieverTimeoutError,
 )
+from .retrievers.tatry import TatryRetriever
 
 __all__ = [
     "BaseRetriever",
