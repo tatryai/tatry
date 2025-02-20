@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from ..models.auth import ValidateResponse
 from ..models.retrieve import BatchQueryResult, DocumentResponse

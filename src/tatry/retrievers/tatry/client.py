@@ -1,4 +1,4 @@
-from typing import Optional, Any, Dict
+from typing import Any, Dict, Optional
 
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
