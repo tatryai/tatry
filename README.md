@@ -1,171 +1,155 @@
-# Tatry Python SDK
+# Tatry Retriever
 
-Official Python SDK for the Tatry Content Retrieval API.
-
+A Python client for interacting with the Tatry API to retrieve documents based on search queries.
 
 ## Installation
 
 ```bash
-pip install tatry
+pip install tatry-retriever
 ```
 
 ## Quick Start
 
 ```python
-from tatry import TatryRetriever
+from tatry_retriever import TatryRetriever
 
-# Initialize the retriever
-retriever = TatryRetriever(api_key="your_api_key")
-
-# Search for documents
-results = retriever.retrieve("quantum computing", max_results=5, ["medical"])
-for doc in results.documents:
-    print(f"Citation: {doc.metadata.citation}")
-    print(f"Content: {doc.content[:200]}...")
-    print(f"Relevance: {doc.relevance_score}")
-    print("---")
-```
-
-## Features
-
-- 🔍 **Content Search**: Search across multiple sources with relevance scoring
-- 📚 **Source Management**: Browse and access different content sources
-- 📊 **Usage Statistics**: Track your API usage
-- 🔒 **Authentication**: Secure API key management
-- 💬 **Feedback System**: Submit and track user feedback
-- ⚡ **Batch Operations**: Perform multiple searches in one request
-- 🛡️ **Type Safety**: Full type hinting support with Pydantic models
-- 🔄 **Automatic Retries**: Built-in retry mechanism with exponential backoff
-
-## Authentication
-
-```python
-from tatry import TatryRetriever
-
-retriever = TatryRetriever(api_key="your_api_key")
+# Initialize the client
+retriever = TatryRetriever(
+    api_key="your_api_key"
+)
 
 # Validate your API key
-validation = retriever.auth.validate_api_key()
-print(f"API Key Valid: {validation.data.valid}")
+validation = retriever.validate_api_key()
+print(f"API key valid: {validation.data.valid}")
 print(f"Permissions: {validation.data.permissions}")
-print(f"Rate Limits: {validation.data.rate_limits.requests_per_minute}/min")
 
-# List all API keys
-keys = retriever.auth.list_keys(status="active")
-for key in keys:
-    print(f"Key: {key.id}")
-    print(f"Last Used: {key.last_used_at}")
-```
-
-## Content Retrieval
-
-### Single Search
-
-```python
-# Basic search
-results = retriever.retrieve.retrieve("artificial intelligence")
-
-# Search with parameters
-results = retriever.retrieve.retrieve(
-    query="machine learning frameworks",
-    max_results=10
+# Perform a simple search
+results = retriever.retrieve(
+    query="climate change impact on agriculture",
+    max_results=5,
+    sources=["source_id_1", "source_id_2"]  # optional
 )
+
+# Print retrieved documents
+for doc in results.documents:
+    print(f"Document ID: {doc.id}")
+    print(f"Score: {doc.relevance_score}")
+    print(f"Source: {doc.metadata.source}")
+    print(f"Content: {doc.content[:100]}...")
+    print("-" * 50)
 ```
 
-### Batch Search
+## API Reference
 
+### Validation
+
+#### `validate_api_key()`
+
+Validates the API key and returns information about associated permissions and rate limits.
+
+**Returns:**
+- `ValidateResponse` object containing:
+  - `status`: API response status
+  - `data`: Validation data including:
+    - `valid`: Boolean indicating if the key is valid
+    - `permissions`: List of permissions granted to this key
+    - `organization_id`: Organization ID for the key
+
+**Example:**
 ```python
-# Perform multiple searches at once
-queries = [
-    {"query": "neural networks", "max_results": 5},
-    {"query": "deep learning", "max_results": 3}
-]
-results = retriever.retrieve.batch_retrieve(queries)
+validation = retriever.validate_api_key()
+if validation.data.valid:
+    print("API key is valid")
+    print(f"Permissions: {validation.data.permissions}")
+else:
+    print("Invalid API key")
 ```
 
-## Source Management
+### Document Retrieval
 
+#### `retrieve(query, max_results=10, sources=[])`
+
+Searches for documents using a text query.
+
+**Parameters:**
+- `query`: String containing the search query
+- `max_results`: Maximum number of results to return (default: 10)
+- `sources`: Optional list of source IDs to restrict the search to
+
+**Returns:**
+- `DocumentResponse` object containing:
+  - `documents`: List of matching `Document` objects
+  - `total`: Total number of matches found
+
+**Example:**
 ```python
-# List all available sources
-sources = retriever.sources.list_sources()
-for source in sources:
-    print(f"Source: {source.name}")
-    print(f"Type: {source.type}")
-    print(f"Coverage: {', '.join(source.coverage)}")
-
-# Get detailed information about a specific source
-wikipedia = retriever.sources.get_source("wikipedia")
-print(f"Total Documents: {wikipedia.metadata.total_documents}")
-print(f"Languages: {', '.join(wikipedia.metadata.languages)}")
-```
-
-## Usage Statistics
-
-```python
-# Get current month's usage
-usage = retriever.utils.get_usage()
-print(f"Total Queries: {usage.data.usage.queries.total}")
-print(f"Documents Retrieved: {usage.data.usage.documents.total}")
-
-# Get usage for a specific month
-usage = retriever.utils.get_usage(month="2024-01")
-```
-
-## Feedback System
-
-```python
-# Submit feedback
-feedback = retriever.utils.submit_feedback(
-    feedback_type="feature",
-    description="Would love to see more academic sources",
-    metadata={"user_type": "researcher"}
+results = retriever.retrieve(
+    query="renewable energy developments",
+    max_results=5,
+    sources=["news_source", "academic_papers"]
 )
-print(f"Feedback ID: {feedback.data.id}")
+
+print(f"Found {results.total} documents")
+for doc in results.documents:
+    print(f"{doc.id}: {doc.content[:50]}... (score: {doc.relevance_score})")
+```
+
+#### `batch_retrieve(queries)`
+
+Performs multiple searches in a single request.
+
+**Parameters:**
+- `queries`: List of query dictionaries, each containing:
+  - `query`: The search query string
+  - `max_results`: Maximum results to return for this query (optional)
+  - `sources`: List of source IDs to search (optional)
+
+**Returns:**
+- List of `BatchQueryResult` objects, each containing:
+  - `query_id`: The query identifier that was provided
+  - `documents`: List of matching `Document` objects
+
+**Example:**
+```python
+batch_results = retriever.batch_retrieve([
+    {"query": "electric vehicles", "max_results": 3},
+    {"query": "solar panel efficiency", "max_results": 5, "sources": ["technical_reports"]},
+])
+
+for result in batch_results:
+    print(f"Query ID: {result.query_id}")
+    print(f"Found {len(result.documents)} documents")
+    for doc in result.documents:
+        print(f"- {doc.metadata.source}: {doc.content[:40]}...")
 ```
 
 ## Error Handling
 
-```python
-from tatry import TatryError, TatryAPIError, TatryAuthError
+The library provides several exception types to handle different error scenarios:
 
+```python
 try:
-    results = retriever.retrieve.search("quantum computing")
-except TatryAuthError:
-    print("Authentication failed")
-except TatryAPIError as e:
-    print(f"API error: {e.status_code}")
-except TatryError as e:
-    print(f"General error: {str(e)}")
+    results = retriever.retrieve("my query")
+except RetrieverAuthError as e:
+    print(f"Authentication failed: {e}")
+except RetrieverTimeoutError as e:
+    print(f"Request timed out: {e}")
+except RetrieverConnectionError as e:
+    print(f"Connection issue: {e}")
+except RetrieverAPIError as e:
+    print(f"API error: {e} (Status: {e.status_code})")
+except RetrieverError as e:
+    print(f"General error: {e}")
 ```
 
 ## Configuration
 
+When initializing the client, you can configure several parameters:
+
 ```python
 retriever = TatryRetriever(
     api_key="your_api_key",
-    timeout=30,                         # Request timeout in seconds
-    max_retries=3                      # Maximum retry attempts
+    timeout=30,  # Request timeout in seconds
+    max_retries=3  # Maximum number of retry attempts
 )
 ```
-
-## Development
-
-```bash
-# Clone the repository
-git clone https://github.com/tatryai/tatry.git
-cd tatry
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
-
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
