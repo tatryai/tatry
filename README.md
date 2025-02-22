@@ -1,17 +1,17 @@
-# Tatry Retriever
+# Tatry
 
 A Python client for interacting with the Tatry API to retrieve documents based on search queries.
 
 ## Installation
 
 ```bash
-pip install tatry-retriever
+pip install tatry
 ```
 
 ## Quick Start
 
 ```python
-from tatry_retriever import TatryRetriever
+from tatry import TatryRetriever
 
 # Initialize the client
 retriever = TatryRetriever(
