@@ -11,11 +11,22 @@ from .exceptions import (
     RetrieverError,
     RetrieverTimeoutError,
 )
-from .retrievers.tatry import TatryRetriever
+
+from .retrievers.tatry import TatryRetriever as CoreTatryRetriever
+from .retrievers.base import BaseRetriever
+
+try:
+    from .integrations.langchain import TatryRetriever as LangChainTatryRetriever
+    HAS_LANGCHAIN = True
+except ImportError:
+    HAS_LANGCHAIN = False
+
+TatryRetriever = CoreTatryRetriever
 
 __all__ = [
     "BaseRetriever",
     "TatryRetriever",
+    "CoreTatryRetriever",
     "RetrieverError",
     "RetrieverAPIError",
     "RetrieverAuthError",
@@ -23,3 +34,6 @@ __all__ = [
     "RetrieverTimeoutError",
     "RetrieverConnectionError",
 ]
+
+if HAS_LANGCHAIN:
+    __all__.append("LangChainTatryRetriever")
