@@ -1,63 +1,64 @@
-from typing import Any, Dict, List, Optional
+from typing import List
 
-from pydantic import BaseModel, Field, model_validator
-
-# Import LangChain's base retriever
 try:
-    from langchain.schema import BaseRetriever as LangChainBaseRetriever
-    from langchain.schema import Document as LangChainDocument
+    from langchain.schema.document import Document as LangChainDocument
+    from langchain.schema.retriever import BaseRetriever as LangChainBaseRetriever
 except ImportError:
-    raise ImportError(
-        "LangChain is not installed. Please install it with `pip install langchain`."
-    )
+    try:
+        from langchain.schema import BaseRetriever as LangChainBaseRetriever
+        from langchain.schema import Document as LangChainDocument
+    except ImportError:
+        raise ImportError(
+            "LangChain is not installed. Please install it with `pip install langchain`."
+        )
 
 from ..retrievers.tatry import TatryRetriever as TatryImpl
 
 
-class TatryRetriever(LangChainBaseRetriever, BaseModel):
+class TatryRetriever(LangChainBaseRetriever):
     """
     Tatry retriever for LangChain.
 
     This class adapts the TatryRetriever to the LangChain interface.
     """
 
-    api_key: str = Field(..., description="API key for Tatry API")
-    base_url: str = Field("https://api.tatry.dev", description="Base URL for Tatry API")
-    timeout: int = Field(30, description="Timeout for API requests in seconds")
-    max_retries: int = Field(
-        3, description="Maximum number of retries for API requests"
-    )
-    sources: List[str] = Field(
-        default_factory=list, description="List of source IDs to search"
-    )
-    max_results: int = Field(10, description="Maximum number of results to return")
+    def __init__(
+        self,
+        api_key: str,
+        base_url: str = "https://api.tatry.dev",
+        timeout: int = 30,
+        max_retries: int = 3,
+        sources: List[str] = None,
+        max_results: int = 10,
+    ):
+        """
+        Initialize the TatryRetriever.
 
-    _client: Optional[TatryImpl] = None
+        Args:
+            api_key: API key for Tatry API
+            base_url: Base URL for Tatry API
+            timeout: Timeout for API requests in seconds
+            max_retries: Maximum number of retries for API requests
+            sources: List of source IDs to search
+            max_results: Maximum number of results to return
+        """
+        LangChainBaseRetriever.__init__(self)
 
-    model_config = {
-        "arbitrary_types_allowed": True,  # Allow the TatryImpl type
-    }
+        self._config = {
+            "api_key": api_key,
+            "base_url": base_url,
+            "timeout": timeout,
+            "max_retries": max_retries,
+            "sources": sources or [],
+            "max_results": max_results,
+        }
 
-    def __init__(self, **data: Any):
-        super().__init__(**data)
         self._client = TatryImpl(
-            api_key=self.api_key,
-            base_url=self.base_url,
-            timeout=self.timeout,
-            max_retries=self.max_retries,
+            api_key=self._config["api_key"],
+            base_url=self._config["base_url"],
+            timeout=self._config["timeout"],
+            max_retries=self._config["max_retries"],
         )
-
-    @model_validator(mode="after")
-    def initialize_client(self) -> "TatryRetriever":
-        """Initialize the client if not already initialized."""
-        if self._client is None:
-            self._client = TatryImpl(
-                api_key=self.api_key,
-                base_url=self.base_url,
-                timeout=self.timeout,
-                max_retries=self.max_retries,
-            )
-        return self
 
     def _get_relevant_documents(self, query: str) -> List[LangChainDocument]:
         """
@@ -71,8 +72,8 @@ class TatryRetriever(LangChainBaseRetriever, BaseModel):
         """
         response = self._client.retrieve(
             query=query,
-            max_results=self.max_results,
-            sources=self.sources,
+            max_results=self._config["max_results"],
+            sources=self._config["sources"],
         )
 
         documents = []
