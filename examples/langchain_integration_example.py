@@ -1,8 +1,11 @@
 """Tatry + Groq RAG test"""
+
 import os
-from tatry.integrations.langchain import TatryRetriever
+
 from langchain.chains import RetrievalQA
-from langchain_groq import ChatGroq # Groq because it's free
+from langchain_groq import ChatGroq  # Groq because it's free
+
+from tatry.integrations.langchain import TatryRetriever
 
 # API keys
 TATRY_API_KEY = os.environ.get("TATRY_API_KEY")
@@ -14,10 +17,7 @@ llm = ChatGroq(api_key=GROQ_API_KEY, model_name="llama3-8b-8192", temperature=0.
 
 # Create RAG chain
 qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=retriever,
-    return_source_documents=True
+    llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True
 )
 
 query = "What are the latest treatments for type 2 diabetes?"

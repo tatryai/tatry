@@ -11,12 +11,12 @@ from .exceptions import (
     RetrieverError,
     RetrieverTimeoutError,
 )
-
-from .retrievers.tatry import TatryRetriever as CoreTatryRetriever
 from .retrievers.base import BaseRetriever
+from .retrievers.tatry import TatryRetriever as CoreTatryRetriever
 
 try:
     from .integrations.langchain import TatryRetriever as LangChainTatryRetriever
+
     HAS_LANGCHAIN = True
 except ImportError:
     HAS_LANGCHAIN = False
