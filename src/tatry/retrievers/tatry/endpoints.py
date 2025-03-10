@@ -11,12 +11,21 @@ class TatryImplementation(TatryClient):
     """Implementation of Tatry API endpoints."""
 
     def retrieve(
-        self, query: str, max_results: int = 10, sources: List[str] = []
+        self, query: str, max_results: int = 5, sources: List[str] = [], min_score: Optional[float] = None
     ) -> DocumentResponse:
+        request_data = {
+            "query": query,
+            "max_results": max_results,
+            "sources": sources,
+        }
+        
+        if min_score is not None:
+            request_data["min_score"] = min_score
+            
         response = self._request(
             "POST",
             "/v1/retrieve",
-            json={"query": query, "max_results": max_results, "sources": sources},
+            json=request_data,
         )
         return DocumentResponse.model_validate(response)
 

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 try:
     from langchain.schema.document import Document as LangChainDocument
@@ -30,6 +30,7 @@ class TatryRetriever(LangChainBaseRetriever):
         max_retries: int = 3,
         sources: List[str] = None,
         max_results: int = 10,
+        min_score: Optional[float] = None,
     ):
         """
         Initialize the TatryRetriever.
@@ -41,6 +42,7 @@ class TatryRetriever(LangChainBaseRetriever):
             max_retries: Maximum number of retries for API requests
             sources: List of source IDs to search
             max_results: Maximum number of results to return
+            min_score: Minimum relevance score threshold (0.0 to 1.0)
         """
         LangChainBaseRetriever.__init__(self)
 
@@ -51,6 +53,7 @@ class TatryRetriever(LangChainBaseRetriever):
             "max_retries": max_retries,
             "sources": sources or [],
             "max_results": max_results,
+            "min_score": min_score,
         }
 
         self._client = TatryImpl(
@@ -74,6 +77,7 @@ class TatryRetriever(LangChainBaseRetriever):
             query=query,
             max_results=self._config["max_results"],
             sources=self._config["sources"],
+            min_score=self._config["min_score"],
         )
 
         documents = []

@@ -12,7 +12,7 @@ TATRY_API_KEY = os.environ.get("TATRY_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 # Initialize retriever and LLM
-retriever = TatryRetriever(api_key=TATRY_API_KEY, max_results=3)
+retriever = TatryRetriever(api_key=TATRY_API_KEY, max_results=3, min_score=0.65)
 llm = ChatGroq(api_key=GROQ_API_KEY, model_name="llama3-8b-8192", temperature=0.1)
 
 # Create RAG chain

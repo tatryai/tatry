@@ -24,9 +24,20 @@ class BaseRetriever(ABC):
 
     @abstractmethod
     def retrieve(
-        self, query: str, max_results: int = 10, sources: List[str] = []
+        self, query: str, max_results: int = 10, sources: List[str] = [], min_score: Optional[float] = None
     ) -> DocumentResponse:
-        """Search for documents using a query."""
+        """
+        Search for documents using a query.
+        
+        Args:
+            query: The search query
+            max_results: Maximum number of results to return
+            sources: List of source IDs to search
+            min_score: Minimum relevance score threshold (0.0 to 1.0)
+        
+        Returns:
+            DocumentResponse object containing matching documents
+        """
         pass
 
     @abstractmethod

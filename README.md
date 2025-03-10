@@ -28,7 +28,8 @@ retriever = TatryRetriever(api_key="your-api-key")
 results = retriever.retrieve(
     query="example query",
     max_results=5,
-    sources=["source1", "source2"]
+    sources=["source1", "source2"],
+    min_score=0.7
 )
 
 # Access the results
@@ -61,7 +62,8 @@ from tatry.integrations.langchain import TatryRetriever
 retriever = TatryRetriever(
     api_key="your-api-key",
     max_results=5,
-    sources=["source1", "source2"]
+    sources=["source1", "source2"],
+    min_score=0.7
 )
 
 # Use it in any LangChain pipeline
